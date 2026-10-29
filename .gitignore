@@ -218,6 +218,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
-data/
+/data/
 mlflow.db
 mlruns/
