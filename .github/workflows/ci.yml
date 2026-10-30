@@ -1,0 +1,41 @@
+name: CI - Pipeline MLOps
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  mlops-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@v4
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: 1 - Extraccion de datos
+        run: python -m src.data.extraction
+
+      - name: 2 - Validacion de datos
+        run: python -m src.data.validation
+
+      - name: 3 - Limpieza de datos
+        run: python -m src.data.cleaning
+
+      - name: 4 - Entrenamiento (MLflow tracking)
+        run: python -m src.training.train --model all
+
+      - name: 5 - Registro y evaluacion (quality gate + champion)
+        run: python -m src.registry.register
+
+      - name: Tests de la API
+        run: python -m pytest -q
